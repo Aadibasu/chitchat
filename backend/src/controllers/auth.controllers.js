@@ -11,7 +11,7 @@ export const signup = async(req,res) =>{
     }
 
     if(password.length < 6){
-      return res.status(400).json({message:"password must be 6 character"});
+      return res.status(400).json({message:"password must be 6 characters"});
     }
 
     //check if email is valid:regex
