@@ -1,6 +1,8 @@
+import {sendWelcomeEmail} from "../email/emailHandlers.js";
 import {generateToken} from "../lib/utlis.js"
 import User from "../models/User.js"
 import bcrypt from "bcryptjs"
+import {ENV} from "../lib/env.js";
 
 
 export const signup = async(req,res) =>{
@@ -11,7 +13,7 @@ export const signup = async(req,res) =>{
     }
 
     if(password.length < 6){
-      return res.status(400).json({message:"password must be 6 character"});
+      return res.status(400).json({message:"password must be 6 characters"});
     }
 
     //check if email is valid:regex
@@ -34,8 +36,10 @@ export const signup = async(req,res) =>{
     })
 
     if(newUser){
-      generateToken(newUser._id,res)
-      await newUser.save();
+  
+      //before genratetoken save in db
+      const saveUser = await newUser.save();
+      generateToken(saveUser._id,res)
 
       res.status(201).json({
         _id:newUser._id,
@@ -43,7 +47,14 @@ export const signup = async(req,res) =>{
         email:newUser.email,
         profilePic:newUser.profilePic,
       });
-      //send a welcome email user
+
+      //send welcome email to user
+      try{
+        await sendWelcomeEmail(saveUser.email,saveUser.fullName,ENV.CLIENT_URL);
+      }catch(error){
+        console.log("Failed to send welcome email:",error);
+      }
+    
     }else{
       res.status(400).json({message:"Invalid user data"})
     }
