@@ -1,4 +1,4 @@
-import aj from "../lib/arcjet.js";
+import {aj} from "../lib/arcjet.js";
 import {isSpoofedBot} from "@arcjet/inspect";
 
 export const arcjetProtection = async (req,res,next) =>{
@@ -17,7 +17,8 @@ export const arcjetProtection = async (req,res,next) =>{
       });
     }
   }
-  if(decision.result.some(isSpoofedBot)){
+  if (decision.reason?.isBot?.() && isSpoofedBot(decision.reason)) {
+
     return res.status(403).json({
       error:"spoofed bot detected",
       message:"malicious but activity detected",

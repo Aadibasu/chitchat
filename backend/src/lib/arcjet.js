@@ -1,7 +1,7 @@
 import {ENV} from "./env.js";
 import arcjet, { shield, detectBot, slidingWindow } from "@arcjet/node";
 
-const aj = arcjet({
+ const aj = arcjet({
   // Get your site key from https://app.arcjet.com and set it as an environment
   // variable rather than hard coding.
   key: ENV.ARCJET_KEY,
@@ -25,7 +25,8 @@ const aj = arcjet({
       mode: "LIVE", // Blocks requests. Use "DRY_RUN" to log only
       // Max 100 requests per minute per IP
       window: 60, // 60 seconds
-      max: 50,// Max 100 requests per window
+      max: 100,// Max 100 requests per window
+      interval:"1m"
     }),
   ],
 });
