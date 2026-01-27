@@ -2,7 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import { useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import ChatPage from "./pages/ChatPage";
-import loginPage from "./pages/LoginPage";
+import LoginPage from "./pages/LoginPage";
 import SignPage from "./pages/SignPage";
 import useAuthStore from "./store/useAuthStore";
 import PageLoader from "./components/PageLoader";
@@ -33,7 +33,7 @@ function App(){
    <Routes>
     <Route path="/"element={authUser ? <ChatPage /> : <Navigate to={"/login"} />} />
 
-    <Route path="/login"element={!authUser ? <loginPage /> : <Navigate to={"/"} />} />
+    <Route path="/login"element={!authUser ? <LoginPage /> : <Navigate to={"/"} />} />
 
     <Route path="/signup"element={!authUser ? <SignPage /> : <Navigate to={"/"} />} />
    </Routes>
