@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom";
-import { useEffect } from "react";
-import { Navigate } from "react-router-dom";
+import  { useEffect }  from "react";
+import  { Navigate }  from "react-router-dom";
 import ChatPage from "./pages/ChatPage";
 import LoginPage from "./pages/LoginPage";
 import SignPage from "./pages/SignPage";
@@ -31,11 +31,11 @@ function App(){
       <div className="absolute bottom-0 -right-4 size-96 bg-cyan-500 opacity-20 blur-[100px]" />
 
    <Routes>
-    <Route path="/"element={authUser ? <ChatPage /> : <Navigate to={"/login"} />} />
+    <Route path="/"element={authUser ? <ChatPage /> : <Navigate to="/login" />} />
 
     <Route path="/login"element={!authUser ? <LoginPage /> : <Navigate to={"/"} />} />
 
-    <Route path="/signup"element={!authUser ? <SignPage /> : <Navigate to={"/"} />} />
+    <Route path="/signup"element={!authUser ? <SignPage /> : <Navigate to={"/"}/>} />
    </Routes>
 
    <Toaster />
