@@ -32,6 +32,7 @@ export const useChatStore = create((set, get) => ({
       set({ isUsersLoading: false });
     }
   },
+  
   getMyChatPartners: async () => {
     set({ isUsersLoading: true });
     try {
@@ -89,6 +90,14 @@ export const useChatStore = create((set, get) => ({
     if (!selectedUser) return;
 
     const socket = useAuthStore.getState().socket;
+    if (!socket) {
+      // if socket hasn't been initialized yet, nothing to subscribe to
+      console.warn("subscribeToMessages called before socket connection");
+      return;
+    }
+
+    // make sure we don't attach multiple handlers
+    socket.off("newMessage");
 
     socket.on("newMessage", (newMessage) => {
       const isMessageSentFromSelectedUser = newMessage.senderId === selectedUser._id;
@@ -108,6 +117,7 @@ export const useChatStore = create((set, get) => ({
 
   unsubscribeFromMessages: () => {
     const socket = useAuthStore.getState().socket;
+    if (!socket) return;
     socket.off("newMessage");
   },
 }));
