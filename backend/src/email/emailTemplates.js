@@ -48,3 +48,16 @@ export function createWelcomeEmailTemplate(name, clientURL) {
   </html>
   `;
 }
+
+export function createResetOtpEmailTemplate(name, otp) {
+  return `
+  <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333;">
+    <h2>Password Reset Request</h2>
+    <p>Hello ${name},</p>
+    <p>We received a request to reset your password. Use the following OTP code to reset it:</p>
+    <p style="font-size: 24px; font-weight: bold;">${otp}</p>
+    <p>This code will expire in 15 minutes. If you did not request a password reset, please ignore this email.</p>
+    <p>Thanks,<br>The Messenger Team</p>
+  </div>
+  `;
+}

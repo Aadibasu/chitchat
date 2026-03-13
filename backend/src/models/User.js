@@ -18,6 +18,13 @@ const userSchema = new mongoose.Schema({
     type:String,
     default:""
   },
+  // fields for password recovery
+  resetOtp: {
+    type: String,
+  },
+  resetOtpExpiry: {
+    type: Date,
+  },
 },{timestamps:true}//created at when
 );
 const User = mongoose.model("User",userSchema)

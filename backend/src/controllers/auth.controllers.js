@@ -1,4 +1,4 @@
-import {sendWelcomeEmail} from "../email/emailHandlers.js";
+import {sendWelcomeEmail, sendOtpEmail} from "../email/emailHandlers.js";
 import {generateToken} from "../lib/utlis.js"
 import User from "../models/User.js"
 import bcrypt from "bcryptjs"
@@ -123,3 +123,97 @@ export const updateProfile = async (req,res) =>{
     res.status(500).json({message:"Internal server error"});
   }
 }
+
+// forgot password: send OTP to email
+export const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json({ message: "Email is required" });
+  }
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      // do not reveal that email doesn't exist
+      return res.status(200).json({ message: "If the account exists, an OTP has been sent" });
+    }
+
+    // generate 6 digit otp
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    user.resetOtp = otp;
+    user.resetOtpExpiry = Date.now() + 15 * 60 * 1000; // 15 minutes
+    await user.save();
+
+    // send email
+    try {
+      await sendOtpEmail(user.email, user.fullName, otp);
+    } catch (err) {
+      console.log("failed to send otp email", err);
+    }
+
+    res.status(200).json({ message: "If the account exists, an OTP has been sent" });
+  } catch (error) {
+    console.error("Error in forgotPassword:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// reset using otp
+export const resetPassword = async (req, res) => {
+  const { email, otp, newPassword } = req.body;
+  if (!email || !otp || !newPassword) {
+    return res.status(400).json({ message: "Email, OTP and new password are required" });
+  }
+  try {
+    const user = await User.findOne({ email });
+    if (
+      !user ||
+      !user.resetOtp ||
+      user.resetOtp !== otp ||
+      !user.resetOtpExpiry ||
+      user.resetOtpExpiry < Date.now()
+    ) {
+      return res.status(400).json({ message: "Invalid or expired OTP" });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: "Password must be at least 6 characters" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+    user.resetOtp = undefined;
+    user.resetOtpExpiry = undefined;
+    await user.save();
+
+    res.status(200).json({ message: "Password has been reset" });
+  } catch (error) {
+    console.error("Error in resetPassword:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// change password when logged in
+export const changePassword = async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+  const userId = req.user._id;
+  if (!oldPassword || !newPassword) {
+    return res.status(400).json({ message: "Old and new password are required" });
+  }
+  try {
+    const user = await User.findById(userId);
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Old password is incorrect" });
+    }
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: "New password must be at least 6 characters" });
+    }
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+    await user.save();
+    res.status(200).json({ message: "Password changed successfully" });
+  } catch (error) {
+    console.error("Error in changePassword:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
