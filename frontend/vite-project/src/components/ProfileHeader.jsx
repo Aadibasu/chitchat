@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
-import { LogOutIcon, VolumeOffIcon, Volume2Icon } from "lucide-react";
+import { LogOutIcon, VolumeOffIcon, Volume2Icon, SettingsIcon } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import useAuthStore from "../store/useAuthStore";
 import { useChatStore } from "../store/useChatStore";
 
@@ -8,6 +9,7 @@ const mouseClickSound = new Audio("/sounds/mouse-click.mp3");
 function ProfileHeader() {
   const { logout, authUser, updateProfile } = useAuthStore();
   const { isSoundEnabled, toggleSound } = useChatStore();
+  const navigate = useNavigate();
   const [selectedImg, setSelectedImg] = useState(null);
 
   const fileInputRef = useRef(null);
@@ -73,6 +75,14 @@ function ProfileHeader() {
             onClick={logout}
           >
             <LogOutIcon className="size-5" />
+          </button>
+
+          {/* SETTINGS / CHANGE PASSWORD */}
+          <button
+            className="text-slate-400 hover:text-slate-200 transition-colors"
+            onClick={() => navigate("/change-password")}
+          >
+            <SettingsIcon className="size-5" />
           </button>
 
           {/* SOUND TOGGLE BTN */}
