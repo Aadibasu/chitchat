@@ -4,6 +4,8 @@ import  { Navigate }  from "react-router-dom";
 import ChatPage from "./pages/ChatPage";
 import LoginPage from "./pages/LoginPage";
 import SignPage from "./pages/SignPage";
+import ForgotPage from "./pages/ForgotPage";
+import ChangePasswordPage from "./pages/ChangePasswordPage";
 import useAuthStore from "./store/useAuthStore";
 import PageLoader from "./components/PageLoader";
 import { Toaster } from "react-hot-toast";
@@ -34,8 +36,11 @@ function App(){
     <Route path="/"element={authUser ? <ChatPage /> : <Navigate to="/login" />} />
 
     <Route path="/login"element={!authUser ? <LoginPage /> : <Navigate to={"/"} />} />
+    <Route path="/forgot" element={!authUser ? <ForgotPage /> : <Navigate to="/" />} />
+    <Route path="/reset" element={!authUser ? <ForgotPage /> : <Navigate to="/" />} />
 
     <Route path="/signup"element={!authUser ? <SignPage /> : <Navigate to={"/"}/>} />
+    <Route path="/change-password" element={authUser ? <ChangePasswordPage /> : <Navigate to="/login" />} />
    </Routes>
 
    <Toaster />

@@ -28,8 +28,12 @@ function MessageInput() {
   };
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (!file.type.startsWith("image/")) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) {
+      // no file selected (cancelled dialog)
+      return;
+    }
+    if (!file.type || !file.type.startsWith("image/")) {
       toast.error("Please select an image file");
       return;
     }

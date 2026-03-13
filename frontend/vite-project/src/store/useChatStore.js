@@ -18,6 +18,8 @@ export const useChatStore = create((set, get) => ({
     set({ isSoundEnabled: !get().isSoundEnabled });
   },
 
+  reset: () => set({ allContacts: [], chats: [], messages: [], selectedUser: null }),
+
   setActiveTab: (tab) => set({ activeTab: tab }),
   setSelectedUser: (selectedUser) => set({ selectedUser }),
 
@@ -85,6 +87,23 @@ export const useChatStore = create((set, get) => ({
     }
   },
 
+  deleteMessage: async (messageId) => {
+    const { messages } = get();
+    try {
+      await axiosInstance.delete(`/messages/${messageId}`);
+      // optimistic removal - server will also emit event for other side
+      set({ messages: messages.filter((m) => m._id !== messageId) });
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Unable to delete message");
+    }
+  },
+
+  // remove message from current conversation only (local deletion)
+  removeLocalMessage: (messageId) => {
+    const { messages } = get();
+    set({ messages: messages.filter((m) => m._id !== messageId) });
+  },
+
   subscribeToMessages: () => {
     const { selectedUser, isSoundEnabled } = get();
     if (!selectedUser) return;
@@ -112,6 +131,12 @@ export const useChatStore = create((set, get) => ({
         notificationSound.currentTime = 0; // reset to start
         notificationSound.play().catch((e) => console.log("Audio play failed:", e));
       }
+    });
+
+    // listen for message deletion events so UI stays in sync
+    socket.on("messageDeleted", (deletedId) => {
+      const currentMessages = get().messages;
+      set({ messages: currentMessages.filter((m) => m._id !== deletedId) });
     });
   },
 

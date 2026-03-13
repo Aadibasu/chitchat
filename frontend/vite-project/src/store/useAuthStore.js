@@ -4,6 +4,8 @@ import toast from 'react-hot-toast';
 
 import { io } from "socket.io-client";
 
+import { useChatStore } from './useChatStore';
+
 const useAuthStore = create((set,get) => ({
   authUser: null,
   socket: null, // will hold socket.io client instance
@@ -52,6 +54,9 @@ const useAuthStore = create((set,get) => ({
 
       toast.success("Logged in successfully");
 
+      // reset chat store on login to new account
+      useChatStore.getState().reset();
+
       // fire up socket after successfully logging in
       get().connectSocket();
     } catch (error) {
@@ -67,6 +72,7 @@ const useAuthStore = create((set,get) => ({
       set({ authUser: null });
       toast.success("Logged out successfully");
       get().disconnectSocket();
+      useChatStore.getState().reset();
     } catch (error) {
       toast.error("Error logging out");
       console.log("Logout error:", error);
@@ -85,13 +91,46 @@ const useAuthStore = create((set,get) => ({
     }
   },
 
+  // forgot password flow
+  requestPasswordReset: async (email) => {
+    try {
+      await axiosInstance.post("/auth/forgot-password", { email });
+      toast.success("If the account exists, an OTP has been sent to the email");
+    } catch (error) {
+      const msg = error?.response?.data?.message || "Request failed";
+      toast.error(msg);
+    }
+  },
+
+  resetPassword: async (payload) => {
+    // payload: { email, otp, newPassword }
+    try {
+      await axiosInstance.post("/auth/reset-password", payload);
+      toast.success("Password has been reset");
+    } catch (error) {
+      const msg = error?.response?.data?.message || "Reset failed";
+      toast.error(msg);
+    }
+  },
+
+  changePassword: async (payload) => {
+    // payload: { oldPassword, newPassword }
+    try {
+      await axiosInstance.put("/auth/change-password", payload);
+      toast.success("Password changed successfully");
+    } catch (error) {
+      const msg = error?.response?.data?.message || "Change failed";
+      toast.error(msg);
+    }
+  },
+
   // ------------------------------------------------------------------
   // socket helpers
   // ------------------------------------------------------------------
   connectSocket: () => {
     // avoid reconnecting
     if (get().socket) return;
-    const url = import.meta.env.MODE === "development" ? "http://localhost:3000" : window.location.origin;
+    const url = import.meta.env.MODE === "development" ? "http://localhost:3001" : window.location.origin;
     const socket = io(url, {
       withCredentials: true,
     });

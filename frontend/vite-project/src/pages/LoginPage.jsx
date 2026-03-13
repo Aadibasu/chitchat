@@ -15,7 +15,7 @@ function LoginPage() {
 
   return (
     <div className="w-full flex items-center justify-center p-4 bg-slate-900">
-      <div className="relative w-full max-w-6xl md:h-[800px] h-[650px]">
+      <div className="relative w-full max-w-6xl md:h-[800px] h-auto min-h-screen">
         <BorderAnimatedContainer>
           <div className="w-full flex flex-col md:flex-row">
             {/* FORM CLOUMN - LEFT SIDE */}
@@ -72,9 +72,12 @@ function LoginPage() {
                   </button>
                 </form>
 
-                <div className="mt-6 text-center">
+                <div className="mt-6 text-center space-y-2">
                   <Link to="/signup" className="auth-link">
                     Don't have an account? Sign Up
+                  </Link>
+                  <Link to="/forgot" className="auth-link text-sm">
+                    Forgot password?
                   </Link>
                 </div>
               </div>
