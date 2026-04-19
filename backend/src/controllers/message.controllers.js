@@ -1,6 +1,6 @@
 import cloudinary from "../lib/cloudinary.js"
-import Message from "../models/Message.js";
-import User from "../models/User.js";
+import Message from "../models/message.js";
+import User from "../models/user.js";
 
 
 export const getAllContacts = async(req,res)=>{
@@ -10,7 +10,7 @@ export const getAllContacts = async(req,res)=>{
     res.status(200).json(filteredUsers);
   }catch{
     console.log("enter in getAllContacts",error);
-    res.status(500).json({message:"server error"});
+    res.status(500).json([]);
   }
 }
 
@@ -28,7 +28,7 @@ export const getMessagesByUserId = async(req,res)=>{
     res.status(200).json(message)
   }catch(error){
     console.log("error in getmessages controllers:",error.message);
-    res.status(500).json({error:"Internal server error"});
+    res.status(500).json([]);
   }
 };
 
@@ -76,7 +76,7 @@ export const sendMessage = async(req,res)=>{
     res.status(201).json(newMessage);
   }catch(error){
     console.log("error in sendMessage controllers:",error.message);
-    res.status(500).json({error:"Internal server error"});
+    res.status(500).json([]);
   }
 }
 
@@ -104,7 +104,7 @@ export const getChatPartners = async (req, res) => {
     res.status(200).json(chatPartners);
   } catch (error) {
     console.error("Error in getChatPartners: ", error.message);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json([]);
   }
 };
 
@@ -143,6 +143,6 @@ export const deleteMessage = async (req, res) => {
     res.status(200).json({ message: "Message deleted", id: messageId });
   } catch (error) {
     console.error("error in deleteMessage controller:", error.message);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json([]);
   }
 };
